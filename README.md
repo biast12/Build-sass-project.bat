@@ -6,5 +6,5 @@ This repository contains two batch scripts to help you set up and manage a SASS 
 
 This script sets up the basic structure for a SASS project. It creates the necessary directories, initializes an HTML file (`index.html`), and sets up SASS files (`style.scss` and partials). Additionally, it configures npm scripts for running and watching SASS.
 
-## Script 2: Build-Choice.bat
+## Script 2: `Build-Choice.bat`
 This script extends the functionality by giving you the option to choose between installing only SASS or both SASS and Bootstrap. It includes a simple menu using `Choice` command.

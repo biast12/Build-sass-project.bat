@@ -31,10 +31,10 @@ IF NOT EXIST scripts Mkdir scripts
 IF NOT EXIST scss Mkdir scss
 
 REM Create initial SASS and JS files
-Echo > scss\_variables.scss
-Echo > scss\_mixins.scss
-Echo > scss\_extends.scss
-Echo > scripts\script.js
+copy nul scss\_variables.scss >NUL
+copy nul scss\_mixins.scss >NUL
+copy nul scss\_extends.scss >NUL
+copy nul scripts\script.js >NUL
 
 REM Create batch files for SASS commands
 Echo npm run sass:run > sass-run.bat

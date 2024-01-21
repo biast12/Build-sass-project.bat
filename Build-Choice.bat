@@ -1,25 +1,59 @@
 @Echo Off
-Title Building sass project
+REM This script sets up a new SASS project
 
-Echo Building sass project
+REM Prompt user for module installation choice
+Title Which modules do you want to install?
+Echo Which modules do you want to install?
+Echo ===========================================
+Echo.
+Echo [1] Sass
+Echo [2] Sass and Bootstrap
+Echo.
+Choice /c:"12" /N /M:"Enter: "
+Set Choice=%ERRORLEVEL%
+CLS
 
-Mkdir css
-Mkdir img
-Mkdir scripts
-Mkdir scss
+REM Verify Node.js and npm are installed
+Where /Q node
+IF %ERRORLEVEL% NEQ 0 (
+	Echo Node.js is not installed or not found in PATH
+	REM Open the Node.js download page in the default browser
+	Start https://nodejs.org/en/download/
+	rundll32.exe cmdext.dll,MessageBeepStub
+	Pause
+	Exit /B %ERRORLEVEL%
+)
+Where /Q npm
+IF %ERRORLEVEL% NEQ 0 (
+	Echo npm is not installed or not found in PATH
+	REM Open the Node.js download page in the default browser
+	Start https://nodejs.org/en/download/
+	rundll32.exe cmdext.dll,MessageBeepStub
+	Pause
+	Exit /B %ERRORLEVEL%
+)
 
+REM Create necessary directories
+IF NOT EXIST css Mkdir css
+IF NOT EXIST img Mkdir img
+IF NOT EXIST scripts Mkdir scripts
+IF NOT EXIST scss Mkdir scss
+
+REM Create initial SASS and JS files
 Echo > scss\_variables.scss
 Echo > scss\_mixins.scss
 Echo > scss\_extends.scss
 Echo > scripts\script.js
 
+REM Create batch files for SASS commands
 Echo npm run sass:run > sass-run.bat
 Echo npm run sass:runcompressed > sass-runcompressed.bat
 Echo npm run sass:watch > sass-watch.bat
 Echo npm run sass:watchcompressed > sass-watchcompressed.bat
 
+REM Create initial HTML file
 (
-	Echo ^<!DOCType html^>
+	Echo ^<!DOCTYPE html^>
 	Echo ^<html lang="en"^>
 	Echo   ^<head^>
 	Echo     ^<meta charset="UTF-8" /^>
@@ -36,43 +70,60 @@ Echo npm run sass:watchcompressed > sass-watchcompressed.bat
 	Echo   ^</body^>
 	Echo ^</html^>
 ) >> index.html
-
-Call npm init -y >NUL
-
-CLS
-Echo Which modules do you wanna install?
-Echo ===========================================
-Echo.
-Echo [1] Sass
-Echo [2] Sass and Bootstrap
-Echo.
-Choice /c:"12" /N /M:"1 or 2"
-
-CLS
-If "%Errorlevel%"=="1" goto :sass
-If "%Errorlevel%"=="2" goto :both
-
-:sass
 (
 	Echo // Import: _variables.scss, _mixins.scss, _extends.scss
 	Echo @import "variables", "mixins", "extends";
 ) >> scss\style.scss
 
+REM Initialize npm
+Call npm init -y >NUL
+IF %ERRORLEVEL% NEQ 0 (
+	Echo npm init failed with error: %ERRORLEVEL%
+	Exit /B %ERRORLEVEL%
+)
+
+REM Check user's choice and jump to the corresponding section
+If "%Choice%"=="1" Goto :Sass
+If "%Choice%"=="2" Goto :Both
+
+REM Install Sass
+:Sass
 Call npm i sass >NUL
+IF %ERRORLEVEL% NEQ 0 (
+	Echo npm i sass failed with error: %ERRORLEVEL%
+	rundll32.exe cmdext.dll,MessageBeepStub
+	Pause
+	Exit /B %ERRORLEVEL%
+)
 Goto :continue
 
-:both
+REM If user chose Sass and Bootstrap, add Bootstrap import to style.scss
+:Both
 (
 	Echo // Import: Bootstrap.scss
 	Echo @import "../node_modules/bootstrap/scss/bootstrap.scss";
-	Echo // Import: _variables.scss, _mixins.scss, _extends.scss
-	Echo @import "variables", "mixins", "extends";
-) >> scss\style.scss
+) >> scss\temp_style.scss
+Type scss\style.scss >> scss\temp_style.scss
+Move /Y scss\temp_style.scss scss\style.scss >NUL 2>&1
 
+REM Install Sass and Bootstrap
 Call npm i sass >NUL
+IF %ERRORLEVEL% NEQ 0 (
+	Echo npm i sass failed with error: %ERRORLEVEL%
+	rundll32.exe cmdext.dll,MessageBeepStub
+	Pause
+	Exit /B %ERRORLEVEL%
+)
 Call npm i bootstrap >NUL
+IF %ERRORLEVEL% NEQ 0 (
+	Echo npm i bootstrap failed with error: %ERRORLEVEL%
+	rundll32.exe cmdext.dll,MessageBeepStub
+	Pause
+	Exit /B %ERRORLEVEL%
+)
 
 :continue
+REM Add SASS scripts to package.json
 (For /f "tokens=* delims=" %%A in ('Type package.json') Do (
 	Echo %%A | Findstr /C:"\"scripts\"" >NUL
 	If Not Errorlevel 1 (
@@ -86,4 +137,5 @@ Call npm i bootstrap >NUL
 	)
 )) > temp_package.json
 
-Move /Y temp_package.json package.json
+REM Replace original package.json with the modified one
+Move /Y temp_package.json package.json >NUL 2>&1

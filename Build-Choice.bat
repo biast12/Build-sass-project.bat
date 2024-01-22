@@ -138,4 +138,4 @@ REM Add SASS scripts to package.json
 )) > temp_package.json
 
 REM Replace original package.json with the modified one
-Move /Y temp_package.json package.json >NUL 2>&1
+Move /Y temp_package.json package.json

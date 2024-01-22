@@ -105,4 +105,7 @@ REM Add SASS scripts to package.json
 	) else (
 		Echo %%A
 	)
-)) > package.json
+)) > temp_package.json
+
+REM Replace original package.json with the modified one
+Move /Y temp_package.json package.json

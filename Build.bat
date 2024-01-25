@@ -58,6 +58,7 @@ REM Create initial HTML file
 	Echo     ^<main^>^</main^>
 	Echo     ^<footer^>^</footer^>
 	Echo     ^<script src="scripts/script.js"^>^</script^>
+	Echo     ^<script src="node_modules/bootstrap/dist/js/bootstrap.js"^>^</script^>
 	Echo   ^</body^>
 	Echo ^</html^>
 ) >> index.html

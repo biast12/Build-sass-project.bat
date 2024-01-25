@@ -1,0 +1,9 @@
+// Ignore all of files
+*
+
+// Include files
+!.gitignore
+!Build.bat
+!Build-Choice.bat
+!README.md
+!Reset.bat

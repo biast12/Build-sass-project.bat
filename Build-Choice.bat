@@ -7,7 +7,7 @@ Echo Which modules do you want to install?
 Echo ===========================================
 Echo.
 Echo [1] Sass
-Echo [2] Sass and Bootstrap
+Echo [2] Sass, Bootstrap and Bootstrap-Icons
 Echo.
 Choice /c:"12" /N /M:"Enter: "
 Set Choice=%ERRORLEVEL%
@@ -67,8 +67,6 @@ REM Create initial HTML file
 	Echo     ^<main^>^</main^>
 	Echo     ^<footer^>^</footer^>
 	Echo     ^<script src="scripts/script.js"^>^</script^>
-	Echo   ^</body^>
-	Echo ^</html^>
 ) >> index.html
 (
 	Echo // Import: _variables.scss, _mixins.scss, _extends.scss
@@ -84,7 +82,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 REM Check user's choice and jump to the corresponding section
 If "%Choice%"=="1" Goto :Sass
-If "%Choice%"=="2" Goto :Both
+If "%Choice%"=="2" Goto :All
 
 REM Install Sass
 :Sass
@@ -95,13 +93,24 @@ IF %ERRORLEVEL% NEQ 0 (
 	Pause
 	Exit /B %ERRORLEVEL%
 )
+(
+	Echo   ^</body^>
+	Echo ^</html^>
+) >> index.html
 Goto :continue
 
 REM If user chose Sass and Bootstrap, add Bootstrap import to style.scss
-:Both
+:All
+(
+	Echo     ^<script src="node_modules/bootstrap/dist/js/bootstrap.js"^>^</script^>
+	Echo   ^</body^>
+	Echo ^</html^>
+) >> index.html
 (
 	Echo // Import: Bootstrap.scss
 	Echo @import "../node_modules/bootstrap/scss/bootstrap.scss";
+	Echo // Import: Bootstrap-icons.css
+	Echo @import "../node_modules/bootstrap-icons/font/bootstrap-icons.css";
 ) >> scss\temp_style.scss
 Type scss\style.scss >> scss\temp_style.scss
 Move /Y scss\temp_style.scss scss\style.scss >NUL 2>&1
@@ -115,6 +124,13 @@ IF %ERRORLEVEL% NEQ 0 (
 	Exit /B %ERRORLEVEL%
 )
 Call npm i bootstrap >NUL
+IF %ERRORLEVEL% NEQ 0 (
+	Echo npm i bootstrap failed with error: %ERRORLEVEL%
+	rundll32.exe cmdext.dll,MessageBeepStub
+	Pause
+	Exit /B %ERRORLEVEL%
+)
+Call npm i bootstrap-icons >NUL
 IF %ERRORLEVEL% NEQ 0 (
 	Echo npm i bootstrap failed with error: %ERRORLEVEL%
 	rundll32.exe cmdext.dll,MessageBeepStub
